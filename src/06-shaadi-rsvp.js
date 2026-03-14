@@ -47,16 +47,60 @@
  */
 export function processGuests(guests, filterFn) {
   // Your code here
+  if(!Array.isArray(guests)) return []
+  if(typeof filterFn !== "function") return []
+
+  let result = [];
+
+  for (const guest of guests) {
+    if(filterFn(guest)){
+      result.push(guest)
+    }
+  } 
+  return result
 }
 
 export function notifyGuests(guests, notifyCallback) {
   // Your code here
+  if(!Array.isArray(guests)) return []
+  if(typeof notifyCallback !== "function") return []
+
+  let results = []
+
+  for (const guest of guests) {
+    let callbackResult = notifyCallback(guest);
+    results.push(callbackResult)
+  }
+  return results
 }
 
 export function handleRSVP(guest, onAccept, onDecline) {
   // Your code here
+  // Agar guest null/undefined or callbacks not functions, return null
+  if(guest === null || guest === undefined) return null
+  if(typeof onAccept !== "function") return null
+  if(typeof onDecline !== "function") return null
+
+  if (guest.rsvp === "yes") {
+    let result = onAccept(guest)
+    return result
+  } else if (guest.rsvp === "no"){
+    let result = onDecline(guest)
+    return result
+  } else {
+    return null
+  }
 }
 
 export function transformGuestList(guests, ...transformFns) {
   // Your code here
+  if(!Array.isArray(guests)) return []
+
+  let result = guests
+
+  for (const fn of transformFns) {
+    result = fn(result)
+  }
+
+  return result
 }

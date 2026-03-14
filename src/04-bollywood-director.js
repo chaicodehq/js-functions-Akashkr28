@@ -46,12 +46,77 @@
  */
 export function createDialogueWriter(genre) {
   // Your code here
+  if (genre === "action") {
+    return function (hero, villain) {
+      if (!hero || !villain) return "...";
+      return `${hero} says: 'Tujhe toh main dekh lunga, ${villain}!'`;
+    };
+  }
+
+  if (genre === "romance") {
+    return function (hero, villain) {
+      if (!hero || !villain) return "...";
+      return `${hero} whispers: '${villain}, tum mere liye sab kuch ho'`;
+    };
+  }
+
+  if (genre === "comedy") {
+    return function (hero, villain) {
+      if (!hero || !villain) return "...";
+      return `${hero} laughs: '${villain} bhai, kya kar rahe ho yaar!'`;
+    };
+  }
+
+  if (genre === "drama") {
+    return function (hero, villain) {
+      if (!hero || !villain) return "...";
+      return `${hero} cries: '${villain}, tune mera sab kuch cheen liya!'`;
+    };
+  }
+
+  return null;
 }
 
 export function createTicketPricer(basePrice) {
   // Your code here
+  if(typeof basePrice !== "number" || basePrice <= 0) return null
+
+  return function (seatType, isWeekend = false) {
+    if (seatType !== "silver" && seatType !== "gold" && seatType !== "platinum") return null
+  
+    let multipliers = {
+      silver: 1,
+      gold: 1.5,
+      platinum: 2
+    }
+  
+    const multiplier = multipliers[seatType]
+  
+    let price = basePrice * multiplier
+  
+    if (isWeekend === true) {
+      const finalPrice =  price * 1.3;
+      return Math.round(finalPrice)
+    } else {
+      return Math.round(price)
+    }
+  }
 }
 
 export function createRatingCalculator(weights) {
   // Your code here
+  if (typeof weights !== "object" || weights === null || Array.isArray(weights) ) return null
+
+    return function (scores) {
+      if (typeof scores !== "object" || scores === null || Array.isArray(scores) ) return null
+
+      let total = 0
+
+      for (const key in weights) {
+        if (key in scores) {
+          total += scores[key] * weights[key]
+        }
+      }
+    return Number(total.toFixed(1))
+  }
 }

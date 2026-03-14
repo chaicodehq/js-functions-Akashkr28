@@ -65,16 +65,82 @@
  */
 export function createElection(candidates) {
   // Your code here
+  const votes = {};
+  const votedVoters = new Set()
+  const registeredVoter = new Set()
+
+  return {
+    registerVoter(voter) {
+      if (!voter || !voter.id || !voter.name || voter.age === undefined) 
+        return false;
+
+      if(voter.age < 18) return false;
+      if(registeredVoter.has(voter.id)) return false;
+      registeredVoter.add(voter.id);
+      return true;
+    },
+
+    castVote(voterId, candidateId, onSuccess, onError) {
+      if(!registeredVoter.has(voterId)) return onError("Voter not registered");
+
+      const candidate = candidates.find(c => c.id === candidateId);
+      if(!candidate) return onError("Candidate not found");
+
+      if(votedVoters.has(voterId)) return onError("Voter has already voted");
+
+      votes[candidateId] = (votes[candidateId] || 0) + 1
+      votedVoters.add(voterId);
+      return onSuccess({ voterId, candidateId})
+    },
+
+    getResults(sortFn) {
+      const results = candidates.map(c => ({
+        ...c,
+        votes: votes[c.id] || 0
+      }))
+
+      const defaultSort = (a, b) => b.votes - a.votes
+      return results.sort(sortFn || defaultSort)
+    },
+
+    getWinner() {
+      if (Object.keys(votes).length === 0) return null;
+
+      const results = this.getResults();
+      return results[0]
+    },
+  }
 }
 
 export function createVoteValidator(rules) {
   // Your code here
+  return function (voter) {
+    const hasAllFields = rules.requiredFields.every(
+      field => voter[field] !== undefined
+    );
+    if (!hasAllFields) return {valid: false, reason:"Missing required fields"}
+
+    if (voter.age < rules.minAge) return {
+      valid: false, reason:"Voter is underage"
+    };
+
+    return {valid: true};
+  }
 }
 
 export function countVotesInRegions(regionTree) {
   // Your code here
+  if(!regionTree) return 0
+
+  return regionTree.votes + regionTree.subRegions.reduce(
+    (sum, sub) => sum + countVotesInRegions(sub), 0
+  )
 }
 
 export function tallyPure(currentTally, candidateId) {
   // Your code here
+  return {
+    ...currentTally,
+    [candidateId]: (currentTally[candidateId] || 0) + 1
+  }
 }
